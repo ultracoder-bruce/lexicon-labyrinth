@@ -57,6 +57,48 @@ const entries = [
   }
 ];
 
+// Mix a familiar everyday word with a nonsense ending to invent fresh compounds.
+const wordRoots = [
+  { word: "snack", pronunciation: "snack", scenario: "one quick trip to the snack cupboard", action: "grab one tiny snack" },
+  { word: "sock", pronunciation: "sock", scenario: "a supposedly normal laundry load", action: "match the laundry" },
+  { word: "chair", pronunciation: "chair", scenario: "sitting down for just one minute", action: "sit down for a second" },
+  { word: "inbox", pronunciation: "in-box", scenario: "opening one work email", action: "check one message" },
+  { word: "glitter", pronunciation: "glit-ter", scenario: "a small, contained craft project", action: "make a quick card" },
+  { word: "coffee", pronunciation: "cof-fee", scenario: "a quick coffee break", action: "make a cup of coffee" },
+  { word: "pigeon", pronunciation: "pij-eon", scenario: "making eye contact with a confident pigeon", action: "walk past a pigeon" },
+  { word: "calendar", pronunciation: "cal-en-dar", scenario: "checking what day it is", action: "check the calendar" },
+  { word: "pajama", pronunciation: "pa-ja-ma", scenario: "putting on comfortable clothes before dinner", action: "change into comfy clothes" },
+  { word: "plant", pronunciation: "plant", scenario: "promising a houseplant you will water it tomorrow", action: "water the plants" },
+  { word: "umbrella", pronunciation: "um-brel-la", scenario: "leaving home under a suspiciously clear sky", action: "check the weather" },
+  { word: "leftover", pronunciation: "left-o-ver", scenario: "saving leftovers for a future version of yourself", action: "put away dinner" }
+];
+
+const wordEndings = [
+  { word: "spiracy", pronunciation: "spir-a-cy", effect: "a committee meeting chaired by your missing keys" },
+  { word: "nesia", pronunciation: "nee-zhuh", effect: "forgetting the one thing you came here to do" },
+  { word: "quake", pronunciation: "quake", effect: "a tiny crisis with wildly disproportionate paperwork" },
+  { word: "ology", pronunciation: "ol-o-gy", effect: "a surprisingly advanced science nobody asked to study" },
+  { word: "magnet", pronunciation: "mag-net", effect: "attracting every minor inconvenience in the room" },
+  { word: "shuffle", pronunciation: "shuf-fle", effect: "rearranging your plans without asking permission" },
+  { word: "whirl", pronunciation: "whirl", effect: "a five-minute task becoming an afternoon expedition" },
+  { word: "gremlin", pronunciation: "grem-lin", effect: "a tiny invisible assistant making everything slightly worse" },
+  { word: "glitch", pronunciation: "glitch", effect: "your brain buffering at the least convenient moment" },
+  { word: "drift", pronunciation: "drift", effect: "wandering off-task with absolutely no memory of the route" },
+  { word: "storm", pronunciation: "storm", effect: "a dramatic debate between you and your to-do list" },
+  { word: "zen", pronunciation: "zen", effect: "an accidental moment of peace you immediately start questioning" }
+];
+
+const definitionTemplates = [
+  (root, ending) => `The peculiar phenomenon where ${root.scenario} somehow becomes ${ending.effect}.`,
+  (root, ending) => `A condition caused by ${root.scenario}, usually ending in ${ending.effect}.`,
+  (root, ending) => `The moment you realize ${root.scenario} has triggered ${ending.effect}.`
+];
+const exampleTemplates = [
+  (root, word) => `“I was only going to ${root.action}, but then ${word} happened.”`,
+  (root, word) => `“This was supposed to take a minute. Classic ${word}.”`,
+  (root, word) => `“I blame the ${word}; I only meant to ${root.action}.”`
+];
+
 const wordElement = document.querySelector("#word");
 const pronunciationElement = document.querySelector("#pronunciation");
 const partElement = document.querySelector("#part-of-speech");
@@ -66,20 +108,19 @@ const numberElement = document.querySelector("#word-number");
 const generateButton = document.querySelector("#generate-button");
 const copyButton = document.querySelector("#copy-button");
 
+let currentEntry = null;
 let currentIndex = -1;
 let wordsShown = 0;
+const generatedWords = new Set();
 
-function showRandomWord() {
-  let nextIndex;
+function pickRandom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
 
-  do {
-    nextIndex = Math.floor(Math.random() * entries.length);
-  } while (entries.length > 1 && nextIndex === currentIndex);
-
-  currentIndex = nextIndex;
+function showWord(entry) {
+  currentEntry = entry;
   wordsShown += 1;
 
-  const entry = entries[currentIndex];
   wordElement.textContent = entry.word;
   pronunciationElement.textContent = entry.pronunciation;
   partElement.textContent = entry.part;
@@ -89,9 +130,50 @@ function showRandomWord() {
   copyButton.textContent = "▢ Copy";
 }
 
+function showRandomWord() {
+  let nextIndex;
+
+  do {
+    nextIndex = Math.floor(Math.random() * entries.length);
+  } while (entries.length > 1 && nextIndex === currentIndex);
+
+  currentIndex = nextIndex;
+  showWord(entries[currentIndex]);
+}
+
+function generateWord() {
+  let combinations = wordRoots.flatMap((root) =>
+    wordEndings.map((ending) => ({ root, ending, word: `${root.word}${ending.word}` }))
+  ).filter((combination) => !generatedWords.has(combination.word));
+
+  // Once every combination has appeared, start a new round of inventions.
+  if (combinations.length === 0) {
+    generatedWords.clear();
+    combinations = wordRoots.flatMap((root) =>
+      wordEndings.map((ending) => ({ root, ending, word: `${root.word}${ending.word}` }))
+    );
+  }
+
+  const combination = pickRandom(combinations);
+  generatedWords.add(combination.word);
+
+  return {
+    word: combination.word,
+    pronunciation: `/${combination.root.pronunciation}·${combination.ending.pronunciation}/`,
+    part: "noun",
+    definition: pickRandom(definitionTemplates)(combination.root, combination.ending),
+    example: pickRandom(exampleTemplates)(combination.root, combination.word)
+  };
+}
+
+function showGeneratedWord() {
+  showWord(generateWord());
+}
+
 async function copyCurrentWord() {
-  const entry = entries[currentIndex];
-  const text = `${entry.word} (${entry.part}) — ${entry.definition}`;
+  if (!currentEntry) return;
+
+  const text = `${currentEntry.word} (${currentEntry.part}) — ${currentEntry.definition}`;
 
   try {
     await navigator.clipboard.writeText(text);
@@ -101,7 +183,7 @@ async function copyCurrentWord() {
   }
 }
 
-generateButton.addEventListener("click", showRandomWord);
+generateButton.addEventListener("click", showGeneratedWord);
 copyButton.addEventListener("click", copyCurrentWord);
 
 showRandomWord();
