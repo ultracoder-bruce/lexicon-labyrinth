@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17152b">
+  <title>Lexicon Labyrinth — Words from the weird side</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="masthead">
+      <a class="brand" href="#" aria-label="Lexicon Labyrinth home">
+        <span class="brand-icon" aria-hidden="true">✳</span>
+        Lexicon Labyrinth
+      </a>
+      <span class="edition">THE UNNECESSARY DICTIONARY</span>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow"><span aria-hidden="true">✦</span> Expand your vocabulary. Confuse your friends.</p>
+      <h1 id="page-title">Words you didn’t know<br>you <span>didn’t need.</span></h1>
+      <p class="intro">Wander through the labyrinth and discover a freshly invented word, complete with a deeply questionable definition.</p>
+
+      <article class="word-card" aria-live="polite" aria-atomic="true">
+        <div class="card-topline">
+          <span class="tag">WORD OF THE MOMENT</span>
+          <span class="word-number" id="word-number">NO. 001</span>
+        </div>
+
+        <div class="word-content">
+          <p class="pronunciation" id="pronunciation">/ˈwɜːrd/</p>
+          <h2 id="word">Loading...</h2>
+          <p class="part-of-speech" id="part-of-speech">noun</p>
+          <p class="definition" id="definition"></p>
+          <p class="example" id="example"></p>
+        </div>
+
+        <div class="card-footer">
+          <span class="made-up"><span aria-hidden="true">✧</span> 100% made up</span>
+          <button class="copy-button" id="copy-button" type="button" aria-label="Copy word and definition">
+            <span aria-hidden="true">▢</span> Copy
+          </button>
+        </div>
+      </article>
+
+      <button class="generate-button" id="generate-button" type="button">
+        <span aria-hidden="true">⟳</span> Find another word
+      </button>
+      <p class="hint">Go on. You know you want to.</p>
+    </section>
+
+    <footer>
+      <span>Lovingly fabricated by the Department of Word Nonsense.</span>
+      <span>Proceed with absolutely no caution.</span>
+    </footer>
+  </main>
+</body>
+</html>
