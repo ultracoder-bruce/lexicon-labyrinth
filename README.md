@@ -8,7 +8,7 @@ No build tools or dependencies are required. Open `index.html` in a browser to t
 
 ## Live site
 
-[lexiconlabyrinth.com](https://lexiconlabyrinth.com)
+The game runs live at [words.numbercatalog.org](https://words.numbercatalog.org).
 
 ## Future improvements
 
